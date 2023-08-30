@@ -1,0 +1,6 @@
+public/**
+*.lock
+.obsidian/**
+.vscode/**
+resources/**
+themes/**
