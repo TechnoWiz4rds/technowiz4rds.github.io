@@ -15,3 +15,4 @@ color = "blue"
 
 ## Title of the blog page
 Content of the blog page
+Used to create content
