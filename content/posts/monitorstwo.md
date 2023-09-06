@@ -10,7 +10,7 @@ description = "Resume of MonitorsTwo from HackTheBox"
 showFullContent = false
 readingTime = true
 hideComments = false
-color = "orange"
+color = "blue"
 +++
 
 # HTB - MonitorsTwo
