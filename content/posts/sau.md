@@ -72,7 +72,7 @@ Lorsque le `Basket` est créé, il est possible de modifier ledit paramètre et 
 ### Code vulnérable
 - https://github.com/darklynx/request-baskets/tree/v1.2.1
 ```go
-# https://github.com/darklynx/request-baskets/blob/a36e2ae402204050ce42a78d750785b4b10e7958/baskets.go#L18C1-L25C2
+// https://github.com/darklynx/request-baskets/blob/a36e2ae402204050ce42a78d750785b4b10e7958/baskets.go#L18C1-L25C2
 
 // BasketConfig describes single basket configuration.
 type BasketConfig struct {
