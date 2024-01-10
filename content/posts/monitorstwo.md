@@ -287,8 +287,8 @@ root.txt:ee5d533931682430845b4c38ad16b362
 ___
 ## Resources:
 
-| Hyperlink | Info |
-| --------- | ---- |
+| Hyperlink                                    | Info                                                    |
+| -------------------------------------------- | ------------------------------------------------------- |
 | https://github.com/sAsPeCt488/CVE-2022-46169 | CVE-2022-46169 - Unauthenticated RCE on cacti <= 1.2.22 |
-| https://github.com/UncleJ4ck/CVE-2021-41091 | CVE-2021-41091 - LPE in Moby (Docker Engine) < 20.10.9 | 
-| https://gtfobins.github.io/gtfobins/capsh/ | GTFObins capsh |
+| https://github.com/UncleJ4ck/CVE-2021-41091  | CVE-2021-41091 - LPE in Moby (Docker Engine) < 20.10.9  |
+| https://gtfobins.github.io/gtfobins/capsh/   | GTFObins capsh                                          |

@@ -10,7 +10,7 @@ Wizards learning **black magic**
 
 ## Members
 ### myDonut 
-!["myDony"](/img/donut.png)
+!["myDonut"](/img/donut.png)
 
 ### Brainmoustache
 !["Brainmoustache"](/img/moustache.png)
