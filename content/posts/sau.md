@@ -112,7 +112,7 @@ Lorsque le lien du panier est visité, la vulnérabilité est activée.
 Basé sur le résultat du scan nmap, il est possible de constater qu'une application est active sur le port `8338/tcp` mais que le trafic est filtré.
 Il est donc possible d'effectuer des requêtes vers cette application grâce à la SSRF. Quelques requêtes suffises afin d'identifier que l'application active est `mailtrail`.
 
-![[/content/img/htb/request_baskets_proxy_configuration.png]]
+![](/img/htb/request_baskets_proxy_configuration.png)
 
 La version du logiciel est `Mailtrail (v0.53)`. Cette version est vulnérable a une exécution de code au niveau du système d'exploitation (OS Command injection).
 
@@ -161,7 +161,7 @@ En effectuant plusieurs requêtes vers le service `Maltrail`, `pager`, un binair
 
 `pager` pointe vers le binaire `less`. En exécutant la commande `!sh`, on obtient un shell en tant que `root`.
 
-![[/content/img/htb/systemctl_status_less_lpe.png]]
+![](/img/htb/systemctl_status_less_lpe.png)
 
 ## Resources:
 
