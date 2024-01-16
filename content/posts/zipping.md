@@ -1,5 +1,5 @@
 +++
-title = "HTB - Writeup"
+title = "HTB - Zipping"
 date = "2024-01-15"
 author = "Brainmoustache"
 authorTwitter = "BrainMoustache" #do not include @
