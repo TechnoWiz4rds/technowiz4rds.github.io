@@ -14,11 +14,6 @@ color = "blue"
 +++
 
 # HTB - Name
-## Resume
-- 
-
---- 
-
 ## Enumeration:
 Nmap
 ```bash
