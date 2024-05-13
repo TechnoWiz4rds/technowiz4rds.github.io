@@ -13,5 +13,7 @@ Wizards learning **black magic**
 !["myDonut"](/img/donut.png)
 
 ### Brainmoustache
-!["Brainmoustache"](/img/moustache.png)
+!["Brainmoustache"](/img/brainmoustache.png)
 
+### Seneque
+!["Brainmoustache"](/img/Seneque.png)
