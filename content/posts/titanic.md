@@ -180,3 +180,4 @@ cat /dev/shm/.dax/root.txt
 | https://github.com/go-gitea/gitea                                                  | Gitea                                                        |
 | https://github.com/pallets/flask                                                   | Flask                                                        |
 | https://github.com/hashcat/hashcat                                                 | hashcat                                                      |
+| https://github.com/ffuf/ffuf                                                       | ffuf                                                         |
