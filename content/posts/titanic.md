@@ -135,6 +135,8 @@ find /opt/app/static/assets/images/ -type f -name "*.jpg" | xargs /usr/bin/magic
 
 By having a look inside the `/opt/app/static/assets/images` directory, we can see that the `metadata.log` file is owned by `root` and is updated every minute. Additionally, the `magick` version installed (7.1.1-35) has a CVE (CVE-2024-41817) for an arbitrary code execution. These two findings combined allows us the elevate or privileges to the root user by crafting a malicious shared library containing a command to execute, placing it in the folder where `magick` is executed and waiting for the `root` user to start the script. There are multiple ways of getting the flag from there, but I did it in 2 steps: first I copied the flag out of `/root/`, and then I changed the permission for me to read it. 
 
+CVE-2024-41817 exploits a vulnerability in the way the `AppImage` version of `ImageMagick` sets the `LD_LIBRARY_PATH` and `MAGICK_CONFIGURE_PATH` environment variables. When those environment variables are not set explicitly, an empty path is prepended (and appended), which might lead to `magick` loading the configuration file (delegates.xml) or shared libraries from the current working directory. 
+
 ```bash
 gcc -x c -shared -fPIC -o ./libxcb.so.1 - << EOF
 #include <stdio.h>
