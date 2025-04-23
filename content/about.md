@@ -17,3 +17,6 @@ Wizards learning **black magic**
 
 ### Seneque
 !["Brainmoustache"](/img/Seneque.png)
+
+### dax
+!["dax"](/img/dax.png)
