@@ -97,7 +97,7 @@ zip exploit.zip rev.phpA.pdf
 
 Par la suite, il faut utiliser un `hex editor` et de modifier la deuxième occurence disponible du byte dans le nom de fichier afin de le remplacer par un `null byte (0x00)`
 
-![](/img/htb/zipping_hex_editor.png)
+![](/img/htb/zipping/zipping_hex_editor.png)
 
 Téléverser ensuite le fichier `zip` modifié sur le serveur.
 
@@ -130,7 +130,7 @@ Content-Disposition: form-data; name="submit"
 ```
 http://10.129.129.1/uploads.php
 
-![](/img/htb/zipping_rev_shell.png)
+![](/img/htb/zipping/zipping_rev_shell.png)
 
 Naviguer vers l'URL
 `http://10.129.129.1/uploads/adf343517b7619d3a07995c1fc6bf62d/rev.php`
