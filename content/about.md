@@ -6,17 +6,17 @@ Wizards learning **black magic**
 
 ## The team
 **TechnoWiz4rds**
-!["Technowiz4rds"](/img/logo.png)
+!["Technowiz4rds"](/img/others/logo.png)
 
 ## Members
 ### myDonut 
-!["myDonut"](/img/donut.png)
+!["myDonut"](/img/others/donut.png)
 
 ### Brainmoustache
-!["Brainmoustache"](/img/brainmoustache.png)
+!["Brainmoustache"](/img/others/brainmoustache.png)
 
 ### Seneque
-!["Brainmoustache"](/img/Seneque.png)
+!["Brainmoustache"](/img/others/Seneque.png)
 
 ### dax
-!["dax"](/img/dax.png)
+!["dax"](/img/others/dax.png)
