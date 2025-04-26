@@ -4,9 +4,9 @@ date = "2025-04-26"
 author = "Brainmoustache"
 authorTwitter = "Brainmoustache"
 cover = ""
-tags = ["resume", "hackthebox", "Vintage"]
-keywords = ["active-directory", ""]
-description = "Resume of Vintage from HackTheBox"
+tags = ["active-directory", "kerberos", "gMSA", "dpapi", "rbcd"]
+keywords = ["hacking", "htb", "vintage", "hack the box"]
+description = "Write-up of Hack The Box hard machine Vintage"
 showFullContent = false
 readingTime = true
 hideComments = false
@@ -128,7 +128,7 @@ Looking at what we have access with P.Rosa, we do not find much.
 
 Keeping in mind the name of the box `Vintage`, we can discover an old behavior of Windows.
 
-![](/content/img/htb/vintage/bloodhound_fs01-memberof.png)
+![](/img/htb/vintage/bloodhound_fs01-memberof.png)
 
 `FS01$` computer account is member of `PRE-WINDOWS 2000 COMPATIBLE ACCESS@VINTAGE.HTB` group.
 
@@ -146,11 +146,11 @@ Using this computer account and searching in bloodhound, we discover a new privi
 
 `FS01.VINTAGE.HTB` is member of `DOMAIN COMPUTERS@VINTAGE.HTB`
 
-![](/content/img/htb/vintage/bloodhound_fs01_memberof.png)
+![](/img/htb/vintage/bloodhound_fs01_memberof.png)
 
 `DOMAIN COMPUTERS@VINTAGE.HTB` can `ReadGMSAPassword` of `GMSA01$@VINTAGE.HTB`.
 
-![](/content/img/htb/vintage/bloodhound_domaincomputer_readgmsapassword.png)
+![](/img/htb/vintage/bloodhound_domaincomputer_readgmsapassword.png)
 
 > A Group Managed Service Account (gMSA) is a type of service account in Windows Server that is specifically designed to provide better management, security, and access control for services, tasks, and applications that run on multiple servers. gMSA accounts are considered like Computer account. ([ref](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/group-managed-service-accounts/group-managed-service-accounts/group-managed-service-accounts-overview))
 
@@ -167,7 +167,7 @@ msDS-ManagedPassword.B64ENCODED: sfyyjet8CbAO5HFzqbtcCtYlqyYohprMvCgeztWhv4z/WOQ
 ```
 `GMSA01$@VINTAGE.HTB` account has `AddSelf` and `GenericWrite` on `SERVICEMANAGERS@VINTAGE.HTB` group.
 
-![](/content/img/htb/vintage/bloodhound_gmsa01_addself.png)
+![](/img/htb/vintage/bloodhound_gmsa01_addself.png)
 
 Adding the computer account into  the group
 ```bash
@@ -186,7 +186,7 @@ python3 bloodyAD.py --dc-ip 10.129.231.205 --host dc01.vintage.htb -d vintage.ht
 - SVC_SQL@VINTAGE.HTB
 - SVC_LDAP@VINTAGE.HTB
 
-![alt text](/content/img/htb/vintage/bloodhound_servicemanagers_genericall.png)
+![](/img/htb/vintage/bloodhound_servicemanagers_genericall.png)
 
 **Since GMSA accounts are considered like Computer account, we must find another account to do the next step. 
 
@@ -363,7 +363,7 @@ export KRB5CCNAME=/home/brainmoustache/hackthebox/vintage/c.neri_adm.ccache
 evil-winrm -i dc01.vintage.htb -r vintage.htb
 ```
 Looking into Bloodhound, we can find the next attack.
-![alt text](/content/img/htb/vintage/bloodhound_c.neri_adm_allowtoact.png)
+![](/img/htb/vintage/bloodhound_c.neri_adm_allowtoact.png)
 
 Analyze:
 - `C.NERI_ADM` has `GenericWrite` on `DELEGATEDADMINS@VINTAGE.HTB`
