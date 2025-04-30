@@ -43,7 +43,32 @@ Looking at the nmap output, we identified a new subdomain `blog.bigbang.htb`.
 
 Adding it into `/etc/hosts`
 
-<blabla>
+![](/content/img/htb/bigbang/webapplication_wordpress.png)
+The web application is a Wordpress. 
+You can validate by looking at the copyright at the bottom. 
+
+There is a form available to send comment on the page. Underneath, you see a mention 
+
+> Proudly brought to you by BuddyForms
+
+![](/content/img/htb/bigbang/webapplication_buddyforms.png)
+
+
+If you look at the HTTP request exchange when submitting the form, you can see this one:
+
+`http://blog.bigbang.htb/wp-content/plugins/buddyforms/assets/js/buddyforms.js?ver=6.5.4`
+
+Searching online for vulnerability about `buddyforms`, we find the [CVE-2023-26326](https://medium.com/tenable-techblog/wordpress-buddyforms-plugin-unauthenticated-insecure-deserialization-cve-2023-26326-3becb5575ed8).
+
+It's talking about `Unauthenticated Insecure Deserialization`. If you continue to search online, you'll eventually find another blog post talking about another bug related to this exploit.
+
+[CVE-2024-2961](https://blog.lexfo.fr/iconv-cve-2024-2961-p1.html)
+
+> The iconv() function in the GNU C Library versions 2.39 and older may overflow the output buffer passed to it by up to 4 bytes when converting strings to the ISO-2022-CN-EXT character set, which may be used to crash an application or overwrite a neighbouring variable. [https://nvd.nist.gov/vuln/detail/cve-2024-2961](https://nvd.nist.gov/vuln/detail/cve-2024-2961)
+
+
+
+
 
 Log into the machine and get the flag
 ```bash
@@ -260,7 +285,9 @@ public final class b extends AsyncTask {
 ```
 This function needs a valid `Bearer`, which could be obtained by login into the application.
 
-We can also spot the vulnerability here. It's in the parameter `output_file`. We could see the parameter is populate using the content of the request.
+We can also spot the vulnerability here. It's in the parameter `output_file`. We could see the parameter is populate using the content of the request. 
+
+The function `FileOutputStream fileOutputStream = new FileOutputStream(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), this.f3686a));` also take the variable without any filtering. 
 
 The following script automate the process of login into the application and send a malicious request to get remote code execution.
 
@@ -290,8 +317,11 @@ cat /root/root.txt
 
 ## Resources:
 
-| Hyperlink                                  | Info            |
-| ------------------------------------------ | --------------- |
-| https://github.com/iamaldi/grafana2hashcat | grafana2hashcat |
-| https://github.com/skylot/jadx             | JADX            |
+| Hyperlink                                                                                                                            | Info                |
+| ------------------------------------------------------------------------------------------------------------------------------------ | ------------------- |
+| https://medium.com/tenable-techblog/wordpress-buddyforms-plugin-unauthenticated-insecure-deserialization-cve-2023-26326-3becb5575ed8 | CVE-2023-26326      |
+| https://blog.lexfo.fr/iconv-cve-2024-2961-p1.html                                                                                    | ICONV CVE-2024-2961 |
+| https://nvd.nist.gov/vuln/detail/cve-2024-2961                                                                                       | NIST CVE-2024-2961  |
+| https://github.com/iamaldi/grafana2hashcat                                                                                           | grafana2hashcat     |
+| https://github.com/skylot/jadx                                                                                                       | JADX                |
 
