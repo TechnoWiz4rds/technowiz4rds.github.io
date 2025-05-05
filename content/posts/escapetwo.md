@@ -423,7 +423,7 @@ Now that we can use the `ca_svc` account, we can see in BloodHound a clear path 
 
 ![](/img/htb/escapetwo/bh_ca_svc_to_admin.png)
 
-The `ADCSESC4` deserves a little bit of explanation. `ADCS` stands for `Active Directory Certificate Service`. `ESC4` simply refers to one of many privilege escalation vectors (labelled `ESC1` to `ESC11`). These vulnerabilities all have the same goal in common: give you access to a certificate enabled for domain authentication so that you can use it to request a Kerberos TGT (basically certificate-based Kerberos authentication). See references for a detailed dive into these vulnerabilities. 
+The `ADCSESC4` deserves a little bit of explanation. `ADCS` stands for `Active Directory Certificate Service`. `ESC4` simply refers to one of many privilege escalation vectors (labelled `ESC1` to `ESC15`). These vulnerabilities all have the same goal in common: give you access to a certificate enabled for domain authentication so that you can use it to request a Kerberos TGT (basically certificate-based Kerberos authentication). See references for a detailed dive into these vulnerabilities. 
 
 `ESC4` indicates a vulnerable certificate template access control. This can be abused to overwrite the configuration of the certificate template to make the template vulnerable to `ESC1`, which is when a certificate template permits client authentication and allows the enrollee to supply an arbitrary Subject Alternative Name or User Principal Name. To exploit this, we can use `certipy`. Their README is very detailed and contains example usage for basically every exploitation technique, so we can follow along pretty easily. 
 
