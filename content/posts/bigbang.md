@@ -44,6 +44,7 @@ Looking at the nmap output, we identified a new subdomain `blog.bigbang.htb`.
 Adding it into `/etc/hosts`
 
 ![](/img/htb/bigbang/webapplication_wordpress.png)
+
 The web application is a Wordpress. 
 You can validate by looking at the copyright at the bottom. 
 
