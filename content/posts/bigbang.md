@@ -757,7 +757,7 @@ drwxr--r-- 2 root root    4096 Jun  5  2024 pdf
 drwxr-xr-x 2 root root    4096 Jun  5  2024 plugins
 drwxr--r-- 2 root root    4096 Jun  5  2024 png
 ```
-Using [`grafana2hashcat`](https://github.com/iamaldi/grafana2hashcat), we get put the db into a format crackable by `hashcat`
+Using [`grafana2hashcat`](https://github.com/iamaldi/grafana2hashcat), we cant convert the db into a format crackable by `hashcat`
 
 The argument `hashes` needed to use `grafana2hashcat` is configured this way
 > hashes      Input file holding the Grafana hashes in the 'hash,salt' format.
