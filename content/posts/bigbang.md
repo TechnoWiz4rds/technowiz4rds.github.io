@@ -110,7 +110,7 @@ Content-Type: text/html; charset=UTF-8
 
 Looking at the content
 ```http
-GET //wp-content//uploads//2025//05//1.png HTTP/1.1
+GET /wp-content/uploads/2025//05/1.png HTTP/1.1
 Host: blog.bigbang.htb
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
