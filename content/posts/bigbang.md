@@ -48,7 +48,7 @@ Adding it into `/etc/hosts`
 The web application is a Wordpress. 
 You can validate by looking at the copyright at the bottom. 
 
-There is a form available to send comment on the page. Underneath, you see a mention 
+There is a form available to send comments on the page. Underneath, you see a mention 
 
 > Proudly brought to you by BuddyForms
 
