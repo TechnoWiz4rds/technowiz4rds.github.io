@@ -991,7 +991,6 @@ cat /root/root.txt
 | https://nvd.nist.gov/vuln/detail/cve-2024-2961                                                                                       | NIST CVE-2024-2961                 |
 | https://github.com/ambionics/wrapwrap                                                                                                | wrapwrap                           |
 | https://github.com/jpillora/chisel                                                                                                   | https://github.com/jpillora/chisel |
-
 | https://github.com/iamaldi/grafana2hashcat                                                                                           | grafana2hashcat                    |
 | https://github.com/skylot/jadx                                                                                                       | JADX                               |
 
