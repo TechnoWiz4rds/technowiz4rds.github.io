@@ -75,7 +75,7 @@ OS and Service detection performed. Please report any incorrect results at https
 
 ## User exploit
 
-Looking at the NMap UDP scan, we can see that SNMP port 161 is open. SNMP can be useful to gather information about a host (and sometimes to write that information too). In this case, as we can see from the NMap service info, the server seems to be a Daloradius server. We can also get this information by querying the `public` community with `snmp-check`.
+Looking at the nmap UDP scan, we can see that SNMP port 161 is open. SNMP is used to monitor and manage devices on IP networks. It can be useful to gather information about a host (and sometimes to write that information too). In this case, as we can see from the nmap service info, the server seems to be a Daloradius server. We can also get this information by querying the `public` community with `snmp-check`.
 
 ```bash
 snmp-check 10.10.11.48 -c public
