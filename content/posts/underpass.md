@@ -22,12 +22,12 @@ Host is up (0.023s latency).
 Not shown: 65533 closed tcp ports (reset)
 PORT   STATE SERVICE VERSION
 22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.10 (Ubuntu Linux; protocol 2.0)
-| ssh-hostkey: 
+| ssh-hostkey:
 |   256 48:b0:d2:c7:29:26:ae:3d:fb:b7:6b:0f:f5:4d:2a:ea (ECDSA)
 |_  256 cb:61:64:b8:1b:1b:b5:ba:b8:45:86:c5:16:bb:e2:a2 (ED25519)
 80/tcp open  http    Apache httpd 2.4.52 ((Ubuntu))
 |_http-title: Apache2 Ubuntu Default Page: It works
-| http-methods: 
+| http-methods:
 |_  Supported Methods: HEAD GET POST OPTIONS
 |_http-server-header: Apache/2.4.52 (Ubuntu)
 Device type: general purpose
@@ -55,7 +55,7 @@ Host is up (0.035s latency).
 Not shown: 65 closed udp ports (port-unreach)
 PORT      STATE         SERVICE         VERSION
 161/udp   open          snmp            SNMPv1 server; net-snmp SNMPv3 server (public)
-| snmp-info: 
+| snmp-info:
 |   enterprise: net-snmp
 |   engineIDFormat: unknown
 |   engineIDData: c7ad5c4856d1cf6600000000
@@ -75,7 +75,7 @@ OS and Service detection performed. Please report any incorrect results at https
 
 ## User exploit
 
-Looking at the NMap UDP scan, we can see that SNPM port 161 is open. SNPM can be useful to gather information about a host (and sometimes to write that information too). In this case, as we can see from the NMap service info, the server seems to be a Daloradius server. We can also get this information by querying the `public` community with `snmp-check`. 
+Looking at the NMap UDP scan, we can see that SNMP port 161 is open. SNMP can be useful to gather information about a host (and sometimes to write that information too). In this case, as we can see from the NMap service info, the server seems to be a Daloradius server. We can also get this information by querying the `public` community with `snmp-check`.
 
 ```bash
 snmp-check 10.10.11.48 -c public
@@ -96,15 +96,15 @@ Copyright (c) 2005-2015 by Matteo Cantoni (www.nothink.org)
   System date                   : 2025-4-23 00:28:23.0
 ```
 
-As per their Github page, daloRADIUS is an advanced RADIUS web management application for managing hotspots and general-purpose ISP deployments. We can have a look at their repository to figure out the directory structure, and soon enough we can find the operator's login page on web port 80 at http://underpass.htb/daloradius/app/operators/login.php. 
+As per their Github page, daloRADIUS is an advanced RADIUS web management application for managing hotspots and general-purpose ISP deployments. We can have a look at their repository to figure out the directory structure, and soon enough we can find the operator's login page on web port 80 at http://underpass.htb/daloradius/app/operators/login.php.
 
 ![](/img/htb/underpass/daloradius_login.png)
 
-A quick Google search gives us the default credentials (administrator:radius), which allows us to log in to the operator's portal. Taking a quick look around, we eventually stumble upon the `Management > Users > List Users` interface, which contains the user `svcMosh`. It also has a very suspicious `Password` column that seems to contain a hash. 
+A quick Google search gives us the default credentials (administrator:radius), which allows us to log in to the operator's portal. Taking a quick look around, we eventually stumble upon the `Management > Users > List Users` interface, which contains the user `svcMosh`. It also has a very suspicious `Password` column that seems to contain a hash.
 
 ![](/img/htb/underpass/daloradius_user.png)
 
-By editing the user and going to the `Check Attributes` tab, we can see that this is indeed an `MD5` hash for the user's password, which we can easily crack online to get the password. 
+By editing the user and going to the `Check Attributes` tab, we can see that this is indeed an `MD5` hash for the user's password, which we can easily crack online to get the password.
 
 ![](/img/htb/underpass/daloradius_pw.png)
 
@@ -112,9 +112,9 @@ We can then use these credentials to log into the SSH port and get the user flag
 
 ## Root exploit
 
-Running `sudo -l` tells us that we can run the command `/usr/bin/mosh-server` as root, without supplying a password (`(ALL) NOPASSWD: /usr/bin/mosh-server`). This command allows us to start a Mobile Shell server. The Mosh Github page tells us that Mosh is a remote terminal application that supports intermittent connectivity, allows roaming, and provides speculative local echo and line editing of user keystrokes. 
+Running `sudo -l` tells us that we can run the command `/usr/bin/mosh-server` as root, without supplying a password (`(ALL) NOPASSWD: /usr/bin/mosh-server`). This command allows us to start a Mobile Shell server. The Mosh Github page tells us that Mosh is a remote terminal application that supports intermittent connectivity, allows roaming, and provides speculative local echo and line editing of user keystrokes.
 
-The Github page doesn't go into many details of how the `mosh-server` command works, but the man page is more helpful. 
+The Github page doesn't go into many details of how the `mosh-server` command works, but the man page is more helpful.
 
 ```
 mosh-server binds to a high UDP port and chooses an encryption key to protect the session. It prints both
@@ -122,7 +122,7 @@ on standard output, detaches from the terminal, and waits for the mosh-client to
 It will exit if no client has contacted it within 60 seconds.
 ```
 
-The `mosh-client` man page also gives us good information. 
+The `mosh-client` man page also gives us good information.
 
 ```
 mosh  itself  is  a  setup  script  that establishes an SSH connection, runs the server-side helper mosh-
@@ -135,7 +135,7 @@ The  22-byte  base64  session  key given by mosh-server is supplied in the MOSH_
 This represents a 128-bit AES key that protects the integrity and confidentiality of the session.
 ```
 
-Now that we know how to use the `mosh-server` and `mosh-client` commands, we can use them to get a root shell. 
+Now that we know how to use the `mosh-server` and `mosh-client` commands, we can use them to get a root shell.
 
 ```bash
 svcMosh@underpass:~$ sudo /usr/bin/mosh-server
